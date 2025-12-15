@@ -1,62 +1,79 @@
-# Compiled files
-*.beam
-*.o
-*.so
-*.dylib
-*.dll
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# RSR-compliant .gitignore
 
-# Build artifacts
-_build/
-.rebar3/
-ebin/
-.eunit/
-
-# Checkpoints (may contain sensitive data)
-priv/checkpoints/*.checkpoint
-
-# Logs
-log/
-*.log
-erl_crash.dump
-
-# Editor files
-.vscode/
-.idea/
+# OS & Editor
+.DS_Store
+Thumbs.db
 *.swp
 *.swo
 *~
-.DS_Store
+.idea/
+.vscode/
 
-# Test output
-.eunit/
-cover/
-*.coverdata
-
-# Release artifacts
-_rel/
-rel/safe_brute_force/
+# Build
+/target/
+/_build/
+/build/
+/dist/
+/out/
 
 # Dependencies
-deps/
+/node_modules/
+/vendor/
+/deps/
+/.elixir_ls/
 
-# Documentation build
-doc/*.html
-doc/*.css
-doc/*.png
-doc/edoc-info
+# Rust
+# Cargo.lock  # Keep for binaries
 
-# Temporary files
+# Elixir
+/cover/
+/doc/
+*.ez
+erl_crash.dump
+
+# Julia
+*.jl.cov
+*.jl.mem
+/Manifest.toml
+
+# ReScript
+/lib/bs/
+/.bsb.lock
+
+# Python (SaltStack only)
+__pycache__/
+*.py[cod]
+.venv/
+
+# Ada/SPARK
+*.ali
+/obj/
+/bin/
+
+# Haskell
+/.stack-work/
+/dist-newstyle/
+
+# Chapel
+*.chpl.tmp.*
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Test/Coverage
+/coverage/
+htmlcov/
+
+# Logs
+*.log
+/logs/
+
+# Temp
+/tmp/
 *.tmp
-tmp/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Custom wordlists (may contain sensitive data)
-priv/wordlists/custom_*.txt
-priv/wordlists/private_*.txt
-
-# Results (may contain sensitive data)
-results/
-*.results
+*.bak
