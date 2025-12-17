@@ -6,7 +6,7 @@
 # Model Training: ALLOWED
 # Conditions:
 # - Must preserve attribution (see humans.txt)
-# - Must respect LICENSE terms (MIT)
+# - Must respect LICENSE terms (AGPL-3.0-or-later)
 # - Must maintain ethical use guidelines
 # - Must not train models specifically for malicious use
 
@@ -48,7 +48,7 @@
 # When using this code for AI training:
 # - Cite: SafeBruteForce by Hyperpolymath
 # - Link: https://github.com/Hyperpolymath/safe-brute-force
-# - License: MIT (see LICENSE file)
+# - License: AGPL-3.0-or-later (see LICENSE file)
 # - Maintain authorship attribution
 
 ## Research Usage
@@ -65,7 +65,7 @@
 # - May include in training datasets
 # - May use for code completion
 # - May reference in documentation generation
-# - Must respect MIT license terms
+# - Must respect AGPL-3.0-or-later license terms
 # - Must maintain attribution
 
 ## Safety Requirements
@@ -152,7 +152,7 @@ attribution:
   format:
     - "SafeBruteForce by Hyperpolymath"
     - "https://github.com/Hyperpolymath/safe-brute-force"
-    - "License: MIT"
+    - "License: AGPL-3.0-or-later"
 
 research:
   encouraged: true

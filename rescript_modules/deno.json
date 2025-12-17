@@ -1,0 +1,31 @@
+{
+  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "name": "@safe-brute-force/rescript-patterns",
+  "version": "0.1.0",
+  "license": "AGPL-3.0-or-later",
+  "tasks": {
+    "build": "deno run --allow-run npm:rescript build",
+    "clean": "deno run --allow-run npm:rescript clean",
+    "watch": "deno run --allow-run npm:rescript build -w",
+    "check": "deno check src/*.bs.js",
+    "test": "deno test --allow-read src/"
+  },
+  "imports": {
+    "rescript": "npm:rescript@^11.0.0",
+    "@rescript/core": "npm:@rescript/core@^1.0.0"
+  },
+  "compilerOptions": {
+    "lib": ["deno.window"],
+    "strict": true
+  },
+  "lint": {
+    "include": ["src/"],
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "include": ["src/"],
+    "lineWidth": 100
+  }
+}
