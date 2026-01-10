@@ -380,7 +380,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for
 
 == 📜 License
 
-MIT License - See [LICENSE](LICENSE) for details.
+Palimpsest-MPL-1.0 License - See [LICENSE](LICENSE) for details.
 
 *Note*: While the software is open source, users are responsible for ensuring their use complies with all applicable laws and regulations.
 
