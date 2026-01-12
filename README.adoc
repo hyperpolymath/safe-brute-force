@@ -424,6 +424,7 @@ This project maintains the principle of *"Safety First"*:
 - *Security Researchers*: For ethical hacking practices
 - *Contributors*: Everyone who helps improve this tool
 
----
+== License
 
-*Remember*: With great power comes great responsibility. Use SafeBruteForce ethically and legally. 🛡️
+Palimpsest License (PMPL-1.0)
+2025 Jonathan D.A. Jewell
