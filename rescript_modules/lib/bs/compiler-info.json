@@ -1,0 +1,8 @@
+{
+  "version": "12.2.0",
+  "bsc_path": "/var$ECLIPSE_DIR/hyper-data/cache/deno/npm/registry.npmjs.org/@rescript/linux-x64/12.2.0/bin/bsc.exe",
+  "bsc_hash": "ca03c46847ff55e2a2115049975f546b655fceff6fc10e34645da2e812314070",
+  "rescript_config_hash": "e0752c25284372186d54b4298cbb8fdec3575e7bf4046e1cad668049efe79e2c",
+  "runtime_path": "/var$ECLIPSE_DIR/hyper-data/cache/deno/npm/registry.npmjs.org/@rescript/runtime/12.2.0",
+  "generated_at": "1772733018266"
+}

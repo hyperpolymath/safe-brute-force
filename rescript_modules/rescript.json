@@ -1,0 +1,22 @@
+{
+  "name": "safe-brute-force-rescript",
+  "version": "0.1.0",
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    }
+  ],
+  "package-specs": [
+    {
+      "module": "esmodule",
+      "in-source": true
+    }
+  ],
+  "suffix": ".res.mjs",
+  "dependencies": [],
+  "warnings": {
+    "error": "+101+8"
+  },
+  "uncurried": true
+}

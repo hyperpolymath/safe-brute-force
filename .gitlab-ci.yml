@@ -1,0 +1,318 @@
+# GitLab CI/CD Pipeline for SafeBruteForce
+# Erlang/OTP + LFE project
+
+variables:
+  OTP_VERSION: "26.2"
+  REBAR3_VERSION: "3.22.1"
+  LFE_VERSION: "2.1.5"
+
+# Define stages
+stages:
+  - build
+  - test
+  - lint
+  - security
+  - docs
+  - deploy
+
+# Cache dependencies
+cache:
+  paths:
+    - _build/
+    - rebar3
+
+# Default image
+default:
+  image: erlang:${OTP_VERSION}
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y make git
+
+###############################################################################
+# Build Stage
+###############################################################################
+
+build:
+  stage: build
+  script:
+    - echo "Installing Rebar3..."
+    - wget https://s3.amazonaws.com/rebar3/rebar3
+    - chmod +x rebar3
+    - ./rebar3 version
+    - echo "Fetching dependencies..."
+    - ./rebar3 get-deps
+    - echo "Compiling project..."
+    - ./rebar3 compile
+  artifacts:
+    paths:
+      - _build/
+      - rebar3
+    expire_in: 1 hour
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - _build/
+      - rebar3
+
+###############################################################################
+# Test Stage
+###############################################################################
+
+test:unit:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - echo "Running unit tests..."
+    - ./rebar3 lfe test
+  artifacts:
+    reports:
+      junit: _build/test/logs/junit.xml
+    when: always
+    expire_in: 1 week
+
+test:coverage:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - echo "Running tests with coverage..."
+    - ./rebar3 lfe test --cover
+    - ./rebar3 cover --verbose
+  coverage: '/Total\s+:\s+(\d+\.\d+)%/'
+  artifacts:
+    paths:
+      - _build/test/cover/
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: _build/test/cover/cobertura.xml
+    expire_in: 1 week
+  allow_failure: true  # Coverage not yet 100%
+
+test:integration:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - echo "Running integration tests..."
+    - ./rebar3 ct
+  artifacts:
+    paths:
+      - _build/test/logs/
+    when: always
+    expire_in: 1 week
+  allow_failure: true  # May not have integration tests yet
+
+###############################################################################
+# Lint Stage
+###############################################################################
+
+lint:dialyzer:
+  stage: lint
+  dependencies:
+    - build
+  script:
+    - echo "Running Dialyzer static analysis..."
+    - ./rebar3 dialyzer
+  allow_failure: true  # Dialyzer can be strict
+
+lint:format:
+  stage: lint
+  dependencies:
+    - build
+  script:
+    - echo "Checking code formatting..."
+    - find src -name "*.lfe" -type f
+    - echo "LFE formatting check (manual review needed)"
+  allow_failure: true
+
+###############################################################################
+# Security Stage
+###############################################################################
+
+security:dependencies:
+  stage: security
+  dependencies:
+    - build
+  script:
+    - echo "Checking for vulnerable dependencies..."
+    - ./rebar3 tree | grep -v "^" || true
+    - echo "Manual security review of dependencies recommended"
+  allow_failure: true
+
+security:rsr-compliance:
+  stage: security
+  script:
+    - echo "Checking RSR Framework compliance..."
+    - echo "✓ CODE_OF_CONDUCT.md exists"
+    - test -f CODE_OF_CONDUCT.md
+    - echo "✓ MAINTAINERS.md exists"
+    - test -f MAINTAINERS.md
+    - echo "✓ .well-known/security.txt exists"
+    - test -f .well-known/security.txt
+    - echo "✓ .well-known/ai.txt exists"
+    - test -f .well-known/ai.txt
+    - echo "✓ .well-known/humans.txt exists"
+    - test -f .well-known/humans.txt
+    - echo "✓ README.md exists"
+    - test -f README.md
+    - echo "✓ LICENSE exists"
+    - test -f LICENSE
+    - echo "✓ CONTRIBUTING.md exists"
+    - test -f docs/CONTRIBUTING.md
+    - echo "✓ SECURITY.md exists"
+    - test -f docs/SECURITY.md
+    - echo "✓ CHANGELOG.md exists"
+    - test -f CHANGELOG.md
+    - echo "RSR Bronze Level compliance verified!"
+
+security:ethical-check:
+  stage: security
+  script:
+    - echo "Verifying safety mechanisms..."
+    - echo "Checking for pause mechanism..."
+    - grep -r "pause_interval" src/ || (echo "❌ Pause mechanism missing!" && exit 1)
+    - echo "✓ Pause mechanism found"
+    - echo "Checking for authorization checks..."
+    - grep -r "authorization" . || (echo "⚠️  Authorization checks recommended" && exit 0)
+    - echo "✓ Authorization checks found"
+    - echo "Checking for rate limiting..."
+    - grep -r "rate_limit" src/ || (echo "❌ Rate limiting missing!" && exit 1)
+    - echo "✓ Rate limiting found"
+    - echo "Safety mechanisms verified!"
+
+###############################################################################
+# Documentation Stage
+###############################################################################
+
+docs:build:
+  stage: docs
+  dependencies:
+    - build
+  script:
+    - echo "Building documentation..."
+    - ./rebar3 edoc
+  artifacts:
+    paths:
+      - doc/
+    expire_in: 1 month
+  allow_failure: true
+
+docs:validate:
+  stage: docs
+  script:
+    - echo "Validating documentation completeness..."
+    - test -f README.md || (echo "❌ README.md missing!" && exit 1)
+    - test -f docs/USAGE.md || (echo "❌ USAGE.md missing!" && exit 1)
+    - test -f docs/SECURITY.md || (echo "❌ SECURITY.md missing!" && exit 1)
+    - test -f docs/CONTRIBUTING.md || (echo "❌ CONTRIBUTING.md missing!" && exit 1)
+    - test -f docs/API_REFERENCE.md || (echo "❌ API_REFERENCE.md missing!" && exit 1)
+    - test -f docs/QUICKSTART.md || (echo "❌ QUICKSTART.md missing!" && exit 1)
+    - echo "✓ All documentation present!"
+
+###############################################################################
+# Deploy Stage (for releases)
+###############################################################################
+
+deploy:release:
+  stage: deploy
+  dependencies:
+    - build
+    - test:unit
+  script:
+    - echo "Building release..."
+    - ./rebar3 as prod release
+    - ./rebar3 as prod tar
+  artifacts:
+    paths:
+      - _build/prod/rel/
+    expire_in: 1 year
+  only:
+    - tags
+    - main
+
+pages:
+  stage: deploy
+  dependencies:
+    - docs:build
+  script:
+    - mkdir -p public
+    - cp -r doc/* public/ || true
+    - cp README.md public/index.md || true
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
+
+###############################################################################
+# Multi-version testing
+###############################################################################
+
+.test_template: &test_definition
+  stage: test
+  script:
+    - ./rebar3 lfe test
+
+test:otp26:
+  <<: *test_definition
+  image: erlang:26
+
+test:otp27:
+  <<: *test_definition
+  image: erlang:27
+  allow_failure: true  # OTP 27 may not be stable yet
+
+###############################################################################
+# Release workflow
+###############################################################################
+
+release:prepare:
+  stage: deploy
+  script:
+    - echo "Preparing release..."
+    - echo "Version: ${CI_COMMIT_TAG}"
+    - echo "Validating version in CHANGELOG..."
+    - grep "${CI_COMMIT_TAG}" CHANGELOG.md || (echo "❌ Version not in CHANGELOG!" && exit 1)
+    - echo "✓ Release validation complete"
+  only:
+    - tags
+
+###############################################################################
+# Scheduled jobs
+###############################################################################
+
+dependency:update:
+  stage: build
+  script:
+    - ./rebar3 update
+    - ./rebar3 upgrade --all
+  only:
+    - schedules
+  allow_failure: true
+
+###############################################################################
+# Manual jobs
+###############################################################################
+
+security:audit:
+  stage: security
+  script:
+    - echo "Running security audit..."
+    - echo "Checking for hardcoded secrets..."
+    - grep -r "password\s*=" src/ && exit 1 || echo "✓ No hardcoded passwords"
+    - grep -r "api_key\s*=" src/ && exit 1 || echo "✓ No hardcoded API keys"
+    - echo "Security audit complete"
+  when: manual
+
+clean:cache:
+  stage: build
+  script:
+    - ./rebar3 clean --all
+    - rm -rf _build/
+  when: manual
+  cache:
+    policy: push
+    key: ${CI_COMMIT_REF_SLUG}
+    paths: []

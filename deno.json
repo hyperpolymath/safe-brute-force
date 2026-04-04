@@ -1,0 +1,15 @@
+{
+  "name": "@hyperpolymath/safe-brute-force",
+  "version": "0.1.0",
+  "tasks": {
+    "dev": "deno run -A npm:rescript build -w rescript_modules",
+    "build": "deno run -A npm:rescript build rescript_modules",
+    "clean": "deno run -A npm:rescript clean rescript_modules",
+    "res:clean": "find rescript_modules/src -name '*.res.mjs' -delete"
+  },
+  "imports": {
+    "rescript": "npm:rescript@^12.0.0",
+    "@rescript/core": "npm:@rescript/core@^1.6.1",
+    "@rescript/runtime/": "npm:/@rescript/runtime@12.2.0/"
+  }
+}

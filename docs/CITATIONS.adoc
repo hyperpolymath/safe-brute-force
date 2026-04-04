@@ -1,0 +1,36 @@
+= safe-brute-force - Citation Guide
+:toc:
+
+== BibTeX
+
+[source,bibtex]
+----
+@software{safe-brute-force_2025,
+  author = {Polymath, Hyper},
+  title = {safe-brute-force},
+  year = {2025},
+  url = {https://github.com/hyperpolymath/safe-brute-force},
+  license = {PMPL-1.0-or-later}
+}
+----
+
+== Harvard Style
+
+Polymath, H. (2025) _safe-brute-force_ [Computer software]. Available at: https://github.com/hyperpolymath/safe-brute-force
+
+== OSCOLA
+
+Hyper Polymath, 'safe-brute-force' (2025) <https://github.com/hyperpolymath/safe-brute-force>
+
+== MLA
+
+Polymath, Hyper. "safe-brute-force." 2025, github.com/hyperpolymath/safe-brute-force.
+
+== APA 7
+
+Polymath, H. (2025). _safe-brute-force_ [Computer software]. GitHub. https://github.com/hyperpolymath/safe-brute-force
+
+== See Also
+
+* link:../CITATION.cff[CITATION.cff]
+* link:../codemeta.json[codemeta.json]

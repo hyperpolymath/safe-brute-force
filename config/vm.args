@@ -1,0 +1,21 @@
+## Name of the node
+-name safe_brute_force@127.0.0.1
+
+## Cookie for distributed erlang
+-setcookie safe_brute_force_cookie
+
+## Heartbeat management; auto-restarts VM if it dies or becomes unresponsive
+-heart
+
+## Enable kernel poll and async thread pool
++K true
++A 30
+
+## Increase number of concurrent ports/sockets
+-env ERL_MAX_PORTS 4096
+
+## Set the location of crash dumps
+-env ERL_CRASH_DUMP ./log/erl_crash.dump
+
+## Increase maximum ETS tables
+-env ERL_MAX_ETS_TABLES 256000

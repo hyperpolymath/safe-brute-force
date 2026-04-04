@@ -1,0 +1,27 @@
+{application, safe_brute_force,
+ [{description, "SafeBruteForce - A controlled, ethical brute-force utility"},
+  {vsn, "0.1.0"},
+  {registered, [sbf_sup, sbf_state_manager, sbf_executor_sup]},
+  {mod, {sbf_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    sasl,
+    lfe,
+    lhttpc,
+    uuid
+   ]},
+  {env, [
+      {pause_interval, 25},           % Pause every N attempts
+      {max_workers, 10},              % Concurrent worker limit
+      {request_timeout, 5000},        % Timeout per attempt (ms)
+      {rate_limit, 100},              % Max attempts per second
+      {checkpoint_interval, 100},     % Save checkpoint every N attempts
+      {checkpoint_dir, "priv/checkpoints"},
+      {default_charset, "abcdefghijklmnopqrstuvwxyz0123456789"},
+      {safety_enabled, true}          % CRITICAL: Always verify pause mechanism
+  ]},
+  {modules, []},
+  {licenses, ["MIT"]},
+  {links, [{"GitHub", "https://github.com/Hyperpolymath/safe-brute-force"}]}
+ ]}.

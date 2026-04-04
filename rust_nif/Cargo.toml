@@ -1,0 +1,30 @@
+[package]
+name = "sbf_nif"
+version = "0.1.0"
+edition = "2021"
+authors = ["Hyperpolymath"]
+license = "MIT"
+description = "High-performance, type-safe Rust NIF for SafeBruteForce"
+
+[lib]
+name = "sbf_nif"
+crate-type = ["dylib"]
+
+[dependencies]
+rustler = "0.32"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rayon = "1.8"  # Parallel iteration
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 0
+
+# Ensure reproducible builds
+[profile.release.package."*"]
+opt-level = 3

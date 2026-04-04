@@ -1,0 +1,22 @@
+{
+  "name": "safe-brute-force-rescript",
+  "version": "0.1.0",
+  "description": "Type-safe pattern generation module for SafeBruteForce",
+  "scripts": {
+    "build": "rescript build",
+    "clean": "rescript clean",
+    "watch": "rescript build -w"
+  },
+  "keywords": [
+    "rescript",
+    "type-safety",
+    "pattern-generation"
+  ],
+  "author": "Hyperpolymath",
+  "license": "MIT",
+  "devDependencies": {
+    "@rescript/core": "^1.0.0",
+    "rescript": "^11.0.0"
+  },
+  "dependencies": {}
+}

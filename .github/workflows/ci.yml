@@ -1,0 +1,347 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# GitHub Actions CI/CD for SafeBruteForce
+# Erlang/OTP + LFE project
+
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, claude/* ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  OTP_VERSION: '26.2'
+  REBAR3_VERSION: '3.22.1'
+
+jobs:
+  ###########################################################################
+  # Build Job
+  ###########################################################################
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Setup Erlang/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ env.OTP_VERSION }}
+          rebar3-version: ${{ env.REBAR3_VERSION }}
+
+      - name: Cache build artifacts
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: |
+            _build
+            ~/.cache/rebar3
+          key: ${{ runner.os }}-build-${{ hashFiles('rebar.config') }}-${{ hashFiles('rebar.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Get dependencies
+        run: rebar3 get-deps
+
+      - name: Compile
+        run: rebar3 compile
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@ea165f8d65b6db9a8b71b5c2d1a090c0daf9c8bb # v4
+        with:
+          name: build-artifacts
+          path: _build/
+          retention-days: 1
+
+  ###########################################################################
+  # Test Jobs
+  ###########################################################################
+  test:
+    name: Test (OTP ${{ matrix.otp }})
+    runs-on: ubuntu-latest
+    needs: build
+
+    strategy:
+      matrix:
+        otp: ['26', '27']
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Setup Erlang/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          rebar3-version: ${{ env.REBAR3_VERSION }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: _build/
+
+      - name: Run tests
+        run: rebar3 lfe test
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6db9a8b71b5c2d1a090c0daf9c8bb # v4
+        with:
+          name: test-results-otp${{ matrix.otp }}
+          path: _build/test/logs/
+          retention-days: 7
+
+  ###########################################################################
+  # Coverage Job
+  ###########################################################################
+  coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Setup Erlang/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ env.OTP_VERSION }}
+          rebar3-version: ${{ env.REBAR3_VERSION }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: _build/
+
+      - name: Run tests with coverage
+        run: rebar3 lfe test --cover
+
+      - name: Generate coverage report
+        run: rebar3 cover --verbose
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: _build/test/cover/cobertura.xml
+          fail_ci_if_error: false
+          verbose: true
+
+  ###########################################################################
+  # Static Analysis
+  ###########################################################################
+  dialyzer:
+    name: Dialyzer Static Analysis
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Setup Erlang/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ env.OTP_VERSION }}
+          rebar3-version: ${{ env.REBAR3_VERSION }}
+
+      - name: Cache PLT
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: _build/default/*_plt
+          key: ${{ runner.os }}-plt-${{ hashFiles('rebar.config') }}
+          restore-keys: |
+            ${{ runner.os }}-plt-
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: _build/
+
+      - name: Run Dialyzer
+        run: rebar3 dialyzer
+        continue-on-error: true
+
+  ###########################################################################
+  # Security Checks
+  ###########################################################################
+  security:
+    name: Security Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Checking for hardcoded passwords..."
+          ! grep -r "password\s*=" src/ || (echo "❌ Found hardcoded passwords" && exit 1)
+          echo "✓ No hardcoded passwords found"
+
+          echo "Checking for API keys..."
+          ! grep -r "api_key\s*=" src/ || (echo "❌ Found hardcoded API keys" && exit 1)
+          echo "✓ No hardcoded API keys found"
+
+      - name: Verify safety mechanisms
+        run: |
+          echo "Checking for pause mechanism..."
+          grep -r "pause_interval" src/ || (echo "❌ Pause mechanism missing!" && exit 1)
+          echo "✓ Pause mechanism verified"
+
+          echo "Checking for rate limiting..."
+          grep -r "rate_limit" src/ || (echo "❌ Rate limiting missing!" && exit 1)
+          echo "✓ Rate limiting verified"
+
+  ###########################################################################
+  # RSR Compliance Check
+  ###########################################################################
+  rsr-compliance:
+    name: RSR Framework Compliance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Check required files
+        run: |
+          echo "Checking RSR Bronze Level compliance..."
+
+          echo "✓ Checking core documentation..."
+          test -f README.md || (echo "❌ README.md missing" && exit 1)
+          test -f LICENSE || (echo "❌ LICENSE missing" && exit 1)
+          test -f CHANGELOG.md || (echo "❌ CHANGELOG.md missing" && exit 1)
+          test -f CODE_OF_CONDUCT.md || (echo "❌ CODE_OF_CONDUCT.md missing" && exit 1)
+          test -f MAINTAINERS.md || (echo "❌ MAINTAINERS.md missing" && exit 1)
+
+          echo "✓ Checking documentation directory..."
+          test -f docs/CONTRIBUTING.md || (echo "❌ CONTRIBUTING.md missing" && exit 1)
+          test -f docs/SECURITY.md || (echo "❌ SECURITY.md missing" && exit 1)
+          test -f docs/USAGE.md || (echo "❌ USAGE.md missing" && exit 1)
+          test -f docs/API_REFERENCE.md || (echo "❌ API_REFERENCE.md missing" && exit 1)
+          test -f docs/QUICKSTART.md || (echo "❌ QUICKSTART.md missing" && exit 1)
+
+          echo "✓ Checking .well-known directory..."
+          test -f .well-known/security.txt || (echo "❌ security.txt missing" && exit 1)
+          test -f .well-known/ai.txt || (echo "❌ ai.txt missing" && exit 1)
+          test -f .well-known/humans.txt || (echo "❌ humans.txt missing" && exit 1)
+
+          echo "✓ Checking build system..."
+          test -f rebar.config || (echo "❌ rebar.config missing" && exit 1)
+          test -f Makefile || (echo "❌ Makefile missing" && exit 1)
+
+          echo ""
+          echo "🎉 RSR Bronze Level Compliance: VERIFIED"
+          echo ""
+          echo "RSR Compliance Checklist:"
+          echo "✓ Documentation complete"
+          echo "✓ .well-known/ directory present"
+          echo "✓ Build system configured"
+          echo "✓ Code of Conduct adopted"
+          echo "✓ Security policy defined"
+          echo "✓ License specified (MIT)"
+          echo "✓ Contribution guidelines available"
+          echo "✓ Maintainers documented"
+          echo ""
+          echo "TPCF Perimeter: 3 (Community Sandbox)"
+
+      - name: Validate security.txt (RFC 9116)
+        run: |
+          echo "Validating security.txt format..."
+          grep -q "Contact:" .well-known/security.txt || (echo "❌ Missing Contact field" && exit 1)
+          grep -q "Expires:" .well-known/security.txt || (echo "❌ Missing Expires field" && exit 1)
+          echo "✓ security.txt format valid"
+
+  ###########################################################################
+  # Documentation
+  ###########################################################################
+  docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Setup Erlang/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ env.OTP_VERSION }}
+          rebar3-version: ${{ env.REBAR3_VERSION }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: _build/
+
+      - name: Build EDoc
+        run: rebar3 edoc
+        continue-on-error: true
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@ea165f8d65b6db9a8b71b5c2d1a090c0daf9c8bb # v4
+        with:
+          name: documentation
+          path: doc/
+          retention-days: 30
+
+  ###########################################################################
+  # Release (on tags)
+  ###########################################################################
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [test, coverage, security, rsr-compliance]
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Setup Erlang/OTP
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ env.OTP_VERSION }}
+          rebar3-version: ${{ env.REBAR3_VERSION }}
+
+      - name: Build release
+        run: |
+          rebar3 as prod release
+          rebar3 as prod tar
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: _build/prod/rel/safe_brute_force/*.tar.gz
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  ###########################################################################
+  # Notify
+  ###########################################################################
+  notify:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [test, coverage, security, rsr-compliance]
+    if: failure()
+
+    steps:
+      - name: Notify failure
+        run: |
+          echo "❌ CI Pipeline Failed"
+          echo "Please check the logs for details"

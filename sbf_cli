@@ -1,0 +1,175 @@
+#!/usr/bin/env escript
+%%! -pa _build/default/lib/*/ebin
+
+%%%-------------------------------------------------------------------
+%%% SafeBruteForce CLI
+%%% Command-line interface for running brute-force operations
+%%%-------------------------------------------------------------------
+
+main([]) ->
+    print_banner(),
+    print_usage(),
+    halt(0);
+
+main(["--help"]) ->
+    print_usage(),
+    halt(0);
+
+main(["-h"]) ->
+    print_usage(),
+    halt(0);
+
+main(["--version"]) ->
+    io:format("SafeBruteForce v0.1.0~n"),
+    halt(0);
+
+main(["wordlist", Wordlist, Target]) ->
+    run_wordlist(Wordlist, Target, "admin");
+
+main(["wordlist", Wordlist, Target, Username]) ->
+    run_wordlist(Wordlist, Target, Username);
+
+main(["pins", Target]) ->
+    run_pins(Target);
+
+main(["charset", Charset, MinLen, MaxLen, Target]) ->
+    run_charset(Charset, list_to_integer(MinLen), list_to_integer(MaxLen), Target);
+
+main(["test"]) ->
+    run_test_mode();
+
+main(_Args) ->
+    io:format("Error: Invalid arguments~n~n"),
+    print_usage(),
+    halt(1).
+
+%%%-------------------------------------------------------------------
+%%% Command Implementations
+%%%-------------------------------------------------------------------
+
+run_wordlist(Wordlist, Target, Username) ->
+    io:format("~n=== SafeBruteForce: Wordlist Mode ===~n"),
+    io:format("Wordlist: ~s~n", [Wordlist]),
+    io:format("Target: ~s~n", [Target]),
+    io:format("Username: ~s~n~n", [Username]),
+
+    verify_authorization(),
+
+    %% Start application
+    application:ensure_all_started(safe_brute_force),
+
+    %% Configure and run
+    PatternConfig = [
+        {type, wordlist},
+        {filename, Wordlist},
+        {mutations, standard}
+    ],
+
+    TargetConfig = [
+        {type, http},
+        {url, Target},
+        {method, post},
+        {username, Username},
+        {username_field, "username"},
+        {password_field, "password"},
+        {success_pattern, "Welcome"},
+        {failure_pattern, "Invalid"}
+    ],
+
+    %% This would call sbf:run/2 if LFE is available
+    io:format("Note: Full execution requires compiled LFE modules~n"),
+    io:format("Use: rebar3 lfe repl~n"),
+    io:format("Then: (sbf:test_http \"~s\" \"~s\" \"~s\")~n", [Target, Username, Wordlist]).
+
+run_pins(Target) ->
+    io:format("~n=== SafeBruteForce: PIN Mode ===~n"),
+    io:format("Testing all 4-digit PINs (10,000 combinations)~n"),
+    io:format("Target: ~s~n~n", [Target]),
+
+    verify_authorization(),
+
+    io:format("Use: rebar3 lfe repl~n"),
+    io:format("Then: (pin_code_test:run)~n").
+
+run_charset(Charset, MinLen, MaxLen, Target) ->
+    io:format("~n=== SafeBruteForce: Charset Mode ===~n"),
+    io:format("Charset: ~s~n", [Charset]),
+    io:format("Length: ~B to ~B~n", [MinLen, MaxLen]),
+    io:format("Target: ~s~n~n", [Target]),
+
+    verify_authorization(),
+
+    %% Calculate total combinations
+    Base = length(Charset),
+    Total = lists:sum([trunc(math:pow(Base, L)) || L <- lists:seq(MinLen, MaxLen)]),
+    io:format("Total combinations: ~B~n~n", [Total]),
+
+    io:format("Use: rebar3 lfe repl~n").
+
+run_test_mode() ->
+    io:format("~n=== SafeBruteForce: Test Mode ===~n"),
+    io:format("Running built-in tests...~n~n"),
+
+    application:ensure_all_started(safe_brute_force),
+
+    io:format("To run tests: rebar3 lfe test~n").
+
+%%%-------------------------------------------------------------------
+%%% Helper Functions
+%%%-------------------------------------------------------------------
+
+print_banner() ->
+    io:format("~n"),
+    io:format("  ███████╗ █████╗ ███████╗███████╗    ██████╗ ███████╗~n"),
+    io:format("  ██╔════╝██╔══██╗██╔════╝██╔════╝    ██╔══██╗██╔════╝~n"),
+    io:format("  ███████╗███████║█████╗  █████╗      ██████╔╝█████╗  ~n"),
+    io:format("  ╚════██║██╔══██║██╔══╝  ██╔══╝      ██╔══██╗██╔══╝  ~n"),
+    io:format("  ███████║██║  ██║██║     ███████╗    ██████╔╝██║     ~n"),
+    io:format("  ╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝    ╚═════╝ ╚═╝     ~n"),
+    io:format("~n"),
+    io:format("  SafeBruteForce v0.1.0~n"),
+    io:format("  ⚠️  For Authorized Security Testing Only ⚠️~n"),
+    io:format("~n").
+
+print_usage() ->
+    io:format("Usage: sbf_cli <command> [options]~n~n"),
+    io:format("Commands:~n"),
+    io:format("  wordlist <file> <target> [username]~n"),
+    io:format("      Brute-force using wordlist~n"),
+    io:format("      Example: sbf_cli wordlist passwords.txt http://localhost/login admin~n~n"),
+    io:format("  pins <target>~n"),
+    io:format("      Test all 4-digit PIN codes~n"),
+    io:format("      Example: sbf_cli pins http://localhost/api/verify~n~n"),
+    io:format("  charset <chars> <min> <max> <target>~n"),
+    io:format("      Test all combinations from charset~n"),
+    io:format("      Example: sbf_cli charset \"abc\" 2 4 http://localhost~n~n"),
+    io:format("  test~n"),
+    io:format("      Run built-in tests~n~n"),
+    io:format("  --help, -h~n"),
+    io:format("      Show this help message~n~n"),
+    io:format("  --version~n"),
+    io:format("      Show version~n~n"),
+    io:format("Interactive Mode (Recommended):~n"),
+    io:format("  rebar3 lfe repl~n"),
+    io:format("  > (sbf:test_http \"http://localhost/login\" \"admin\" \"wordlist.txt\")~n~n"),
+    io:format("Safety Features:~n"),
+    io:format("  - Automatic pause every 25 attempts~n"),
+    io:format("  - Manual pause/resume controls~n"),
+    io:format("  - Checkpoint save/restore~n"),
+    io:format("  - Rate limiting~n~n"),
+    io:format("Documentation: https://github.com/Hyperpolymath/safe-brute-force~n").
+
+verify_authorization() ->
+    io:format("⚠️  AUTHORIZATION CHECK ⚠️~n"),
+    io:format("You must have written authorization to test this system.~n"),
+    io:format("Unauthorized access attempts are illegal.~n~n"),
+    io:format("Do you have authorization to test this system? (yes/no): "),
+
+    case io:get_line("") of
+        "yes\n" ->
+            io:format("Proceeding with authorized testing...~n~n"),
+            ok;
+        _ ->
+            io:format("Authorization not confirmed. Exiting.~n"),
+            halt(1)
+    end.
