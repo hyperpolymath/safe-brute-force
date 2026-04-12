@@ -1,0 +1,134 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= SafeBruteForce — EXPLAINME
+:toc: preamble
+:icons: font
+
+This file maps README.adoc claims to their implementation evidence for
+sceptical developers.
+
+== "Controlled, ethical brute-force utility with automatic safety pauses"
+
+[quote, README.adoc]
+____
+Automatic Safety Pauses: Stops every 25 attempts, requires user confirmation.
+____
+
+How this is implemented::
+`src/sbf_state.lfe` implements an OTP `gen_statem` state machine with three
+states: `running`, `paused`, and `waiting`. The `should-pause?` predicate
+fires when `(rem attempt-count 25) == 0`, transitioning to `waiting` and
+blocking execution until the user sends a `{continue}` message. The state
+machine cannot be bypassed — it sits between the executor and the pattern
+generator.
+
+Caveat::
+The pause interval (25 attempts) is the default. It can be configured in
+`config/sys.config` but cannot be set to infinity — the safety pause is
+a mandatory mechanism, not an optional feature.
+
+== "Erlang/OTP concurrent architecture via LFE"
+
+[quote, README.adoc]
+____
+Concurrent architecture using Erlang/OTP: supervision trees, gen_server
+executor, gen_statem state machine.
+____
+
+How this is implemented::
+`src/sbf_app.lfe` is the OTP application entry point. `src/sbf_sup.lfe`
+is the supervisor using `one_for_one` strategy — if the executor crashes,
+it is restarted without taking down the state machine. `src/sbf_executor.lfe`
+is a `gen_server` that manages the worker pool and tracks attempt counts.
+`rebar.config` and `rebar.lock` define the build and dependency configuration.
+The LFE (Lisp Flavored Erlang) dialect compiles to the same BEAM bytecode as
+Erlang.
+
+Caveat::
+LFE is an unusual choice for a hyperpolymath project (Gleam is the preferred
+BEAM language). This repo pre-dates the Gleam preference and uses LFE. Future
+versions may migrate to Gleam.
+
+== "Rate limiting via token bucket algorithm"
+
+[quote, README.adoc]
+____
+Rate Limiting: Token bucket algorithm for controlled request rates.
+____
+
+How this is implemented::
+`src/sbf_rate_limiter.lfe` implements a token bucket: a bucket is refilled at
+a configurable rate (tokens per second), and each attempt consumes one token.
+When the bucket is empty, the executor waits until a token is available before
+proceeding. This is in addition to (not instead of) the safety pause.
+
+Caveat::
+The token bucket is a soft rate limit — it adds delay but does not guarantee
+a precise requests-per-second rate due to Erlang scheduler jitter. For
+strict rate limiting, pair with system-level network controls.
+
+== "Checkpoint and resume for long-running operations"
+
+[quote, README.adoc]
+____
+Checkpoints: Auto-save and manual checkpoint creation. Resume from checkpoints.
+____
+
+How this is implemented::
+`src/sbf_checkpoint.lfe` serialises the current execution state (attempt count,
+patterns tried, successful patterns) to DETS (Erlang disk-based term storage)
+with a timestamped key. The REPL function `sbf:save_checkpoint/1` writes a
+manual checkpoint; `sbf:load_checkpoint/1` restores from a named checkpoint.
+Checkpoints are stored in the `priv/checkpoints/` directory.
+
+Caveat::
+DETS is not a crash-safe storage — a power loss during a write may corrupt
+the checkpoint file. For critical long-running sessions, use frequent manual
+checkpoints rather than relying solely on auto-save.
+
+== Dogfooded Across The Account
+
+[cols="1,2,2", options="header"]
+|===
+| Technology / Pattern | Used here | Also used in
+
+| OTP gen_statem for state machines
+| Pause/resume state machine
+| link:https://github.com/hyperpolymath/boj-server[boj-server]
+  (cartridge lifecycle state management)
+
+| Erlang/BEAM for concurrency
+| Worker pool, supervision trees
+| link:https://github.com/hyperpolymath/burble[burble]
+  (Elixir/BEAM control plane)
+
+| Token bucket rate limiting
+| Attempt rate control
+| link:https://github.com/hyperpolymath/boj-server[boj-server]
+  (API rate limiting)
+
+| Rebar3 build tool
+| LFE compilation and test runner
+| Unique to BEAM Erlang repos in the account
+
+| DETS persistence
+| Checkpoint storage
+| Unique to this repo
+|===
+
+== Known Gaps
+
+[CAUTION]
+====
+The README and `CLAUDE.md` at the repo root reference LFE (Lisp Flavored
+Erlang) as the language, but the hyperpolymath-standard BEAM language is
+Gleam. A future migration from LFE to Gleam is the correct direction.
+====
+
+The `rust_nif/` directory and `rebar.config`'s Rust NIF support suggest a
+Rust-backed performance path is planned but not yet implemented. The current
+implementation is pure LFE.
+
+The web UI mentioned in the v0.2.0 roadmap section does not yet exist. SSH,
+FTP, and database connection modules are also roadmap items, not current
+capabilities.
