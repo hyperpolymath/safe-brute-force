@@ -1,3 +1,5 @@
+import? "contractile.just"
+
 # safe-brute-force - Nix Development Tasks
 set shell := ["bash", "-uc"]
 set dotenv-load := true
