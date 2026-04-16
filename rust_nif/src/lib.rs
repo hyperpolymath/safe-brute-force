@@ -394,14 +394,14 @@ mod tests {
 
     #[test]
     fn test_generate_combinations() {
-        let charset = Charset::new("ab").unwrap();
-        let patterns = generate_charset_combinations(&charset, 1, 2).unwrap();
+        let charset = Charset::new("ab").expect("TODO: handle error");
+        let patterns = generate_charset_combinations(&charset, 1, 2).expect("TODO: handle error");
         assert_eq!(patterns.len(), 6); // a, b, aa, ab, ba, bb
     }
 
     #[test]
     fn test_sequential_generation() {
-        let patterns = generate_sequential_parallel(1, 5).unwrap();
+        let patterns = generate_sequential_parallel(1, 5).expect("TODO: handle error");
         assert_eq!(patterns.len(), 5);
         assert_eq!(patterns[0], "1");
         assert_eq!(patterns[4], "5");
