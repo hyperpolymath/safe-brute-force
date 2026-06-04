@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # ReScript Pattern Generation Module
 
 This module provides **100% type-safe pattern generation** for SafeBruteForce.

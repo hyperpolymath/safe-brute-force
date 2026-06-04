@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # Multi-Language Architecture (iSOS Model)
 
 SafeBruteForce now implements the **iSOS (Integrated Sound Operating System)** multi-language architecture from the RSR Framework, combining the strengths of multiple type-safe languages.

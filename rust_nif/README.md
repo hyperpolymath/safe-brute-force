@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # Rust NIF Module for SafeBruteForce
 
 This module provides **100% type-safe AND memory-safe** high-performance pattern generation using Rust NIFs (Native Implemented Functions).
