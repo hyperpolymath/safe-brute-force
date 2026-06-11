@@ -86,3 +86,6 @@ test-examples:
 
 # Run all 6 Grade B test targets
 test: test-lfe test-structure test-compile test-static test-nickel test-examples
+
+secret-scan-trufflehog:
+    @command -v trufflehog >/dev/null && trufflehog filesystem . --only-verified || true
