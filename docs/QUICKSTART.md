@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # SafeBruteForce Quick Start Guide
 
 Get up and running with SafeBruteForce in 5 minutes.

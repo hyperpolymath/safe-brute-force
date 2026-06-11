@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MPL-2.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = SafeBruteForce — EXPLAINME
+image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
+
 :toc: preamble
 :icons: font
 
@@ -132,3 +135,10 @@ implementation is pure LFE.
 The web UI mentioned in the v0.2.0 roadmap section does not yet exist. SSH,
 FTP, and database connection modules are also roadmap items, not current
 capabilities.
+
+
+== License
+
+This project is licensed under the Mozilla Public License, v. 2.0. See the `LICENSE` file for details.
+
+SPDX-License-Identifier: MPL-2.0

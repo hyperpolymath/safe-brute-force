@@ -1,3 +1,7 @@
+<!--
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # SafeBruteForce v0.1.0 - Complete Implementation Summary
 
 This document summarizes the comprehensive implementation completed in this session.
