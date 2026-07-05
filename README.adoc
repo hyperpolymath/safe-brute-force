@@ -1,22 +1,19 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = 🔒 SafeBruteForce
-image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=openssourcesecurity[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://github.com/hyperpolymath/safe-brute-force"]
-
 
 image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
-// SPDX-FileCopyrightText: 2025 Jonathan D.A. Jewell
-
-[![RSR Compliance](https://img.shields.io/badge/RSR-Bronze-cd7f32)](RSR_COMPLIANCE.md)
-[![TPCF Perimeter](https://img.shields.io/badge/TPCF-P3%20Community-green)](MAINTAINERS.md)
-[![Erlang/OTP]()](https://www.erlang.org/)
-[![LFE]()](https://lfe.io/)
-[![CI](https://img.shields.io/badge/CI-GitLab%20%7C%20GitHub-blue)](.github/workflows/ci.yml)
-[![Security](https://img.shields.io/badge/security.txt-RFC%209116-informational)](.well-known/security.txt)
+image:https://img.shields.io/badge/OpenSSF-Best_Practices-green[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://github.com/hyperpolymath/safe-brute-force"]
+image:https://img.shields.io/badge/RSR-Bronze-cd7f32[RSR Compliance,link="RSR_COMPLIANCE.md"]
+image:https://img.shields.io/badge/TPCF-P3_Community-green[TPCF Perimeter,link="MAINTAINERS.md"]
+image:https://img.shields.io/badge/Erlang%2FOTP-26+-A90533?logo=erlang&logoColor=white[Erlang/OTP,link="https://www.erlang.org/"]
+image:https://img.shields.io/badge/LFE-Lisp_Flavoured_Erlang-orange[LFE,link="https://lfe.io/"]
+image:https://img.shields.io/badge/CI-GitLab_%7C_GitHub-blue[CI,link="https://github.com/hyperpolymath/safe-brute-force/actions"]
+image:https://img.shields.io/badge/security.txt-RFC_9116-informational[Security,link=".well-known/security.txt"]
 
 A *controlled, ethical brute-force utility* designed for authorized security testing and penetration testing engagements. Unlike traditional brute-force tools that flood systems recklessly, SafeBruteForce prioritizes safety, user control, and system preservation.
 
-```
+....
   ███████╗ █████╗ ███████╗███████╗    ██████╗ ███████╗
   ██╔════╝██╔══██╗██╔════╝██╔════╝    ██╔══██╗██╔════╝
   ███████╗███████║█████╗  █████╗      ██████╔╝█████╗
@@ -26,7 +23,7 @@ A *controlled, ethical brute-force utility* designed for authorized security tes
 
   SafeBruteForce v0.1.0 - Controlled Ethical Testing
   ⚠️  For Authorized Security Testing Only ⚠️
-```
+....
 
 == 🔍 Why SafeBruteForce?
 
@@ -90,50 +87,54 @@ SafeBruteForce *redefines brute-forcing* as a controlled, pausable process:
 
 === Prerequisites
 
-```bash
-= Erlang/OTP 26 or higher
+[source,bash]
+----
+# Erlang/OTP 26 or higher
 
-= Ubuntu/Debian:
+# Ubuntu/Debian:
 
 sudo apt-get install erlang
 
-= macOS:
+# macOS:
 
 brew install erlang
 
-= Rebar3 (build tool)
+# Rebar3 (build tool)
 
 curl -O https://s3.amazonaws.com/rebar3/rebar3
 chmod +x rebar3
 sudo mv rebar3 /usr/local/bin/
-```
+----
 
 === Installation
 
-```bash
-= Clone the repository
+[source,bash]
+----
+# Clone the repository
 
 git clone https://github.com/Hyperpolymath/safe-brute-force.git
 cd safe-brute-force
 
-= Compile
+# Compile
 
 rebar3 compile
 
-= Run tests
+# Run tests
 
 rebar3 lfe test
-```
+----
 
 === Quick Start
 
 ==== Interactive REPL (Recommended)
 
-```bash
+[source,bash]
+----
 rebar3 lfe repl
-```
+----
 
-```lisp
+[source,lisp]
+----
 ;; Start the application
 > (sbf:start)
 
@@ -160,34 +161,36 @@ rebar3 lfe repl
 
 ;; Get detailed statistics
 > (sbf:stats)
-```
+----
 
 ==== Command Line Interface
 
-```bash
-= Make CLI executable
+[source,bash]
+----
+# Make CLI executable
 
 chmod +x sbf_cli
 
-= Test with wordlist
+# Test with wordlist
 
 ./sbf_cli wordlist priv/wordlists/common-passwords.txt \
           http://localhost/login admin
 
-= Test PIN codes
+# Test PIN codes
 
 ./sbf_cli pins http://localhost/api/verify
 
-= Generate charset combinations
+# Generate charset combinations
 
 ./sbf_cli charset "abc123" 4 6 http://localhost
-```
+----
 
 == 📖 Usage Examples
 
 === Example 1: HTTP Login Testing
 
-```lisp
+[source,lisp]
+----
 (let ((pattern-config
        (list (tuple 'type 'wordlist)
              (tuple 'filename "passwords.txt")
@@ -202,11 +205,12 @@ chmod +x sbf_cli
              (tuple 'success_pattern "Welcome")
              (tuple 'failure_pattern "Invalid"))))
   (sbf:run pattern-config target-config))
-```
+----
 
 === Example 2: PIN Code Testing
 
-```lisp
+[source,lisp]
+----
 ;; Test all 4-digit PINs with custom validator
 (let ((validator
        (lambda (pin)
@@ -221,11 +225,12 @@ chmod +x sbf_cli
        (list (tuple 'type 'function)
              (tuple 'function validator))))
   (sbf:run pattern-config target-config))
-```
+----
 
 === Example 3: Custom Pattern Generation
 
-```lisp
+[source,lisp]
+----
 ;; Company-specific password patterns
 (let ((pattern-generator
        (lambda ()
@@ -244,11 +249,12 @@ chmod +x sbf_cli
              (tuple 'url "http://testsite.local/login")
              (tuple 'username "testuser"))))
   (sbf:run pattern-config target-config))
-```
+----
 
 === Example 4: Checkpoint Management
 
-```lisp
+[source,lisp]
+----
 ;; Start a long-running operation
 > (sbf:run_async pattern-config target-config)
 #Pid<0.234.0>
@@ -263,13 +269,13 @@ chmod +x sbf_cli
 
 > (sbf:load_checkpoint "my_session_1705334400_1234")
 {ok, #{state => ...}}
-```
+----
 
 == 🏗️ Architecture
 
 SafeBruteForce is built on *Erlang/OTP* principles for robustness and concurrency:
 
-```
+....
 ┌─────────────────────────────────────────────────┐
 │              sbf_app (Application)              │
 └───────────────────┬─────────────────────────────┘
@@ -289,7 +295,7 @@ SafeBruteForce is built on *Erlang/OTP* principles for robustness and concurrenc
     - running          - Pattern execution
     - paused           - Rate limiting
     - waiting          - Result tracking
-```
+....
 
 === Core Modules
 
@@ -335,55 +341,56 @@ Be aware of applicable laws in your jurisdiction:
 
 == 📚 Documentation
 
-- *[Usage Guide](docs/USAGE.md)*: Comprehensive usage instructions
-- *[Security Best Practices](docs/SECURITY.md)*: Legal and ethical guidelines
-- *[Contributing Guide](docs/CONTRIBUTING.md)*: How to contribute
-- *[CLAUDE.md](CLAUDE.md)*: AI assistant guidance for development
+- *link:docs/USAGE.md[Usage Guide]*: Comprehensive usage instructions
+- *link:docs/SECURITY.md[Security Best Practices]*: Legal and ethical guidelines
+- *link:docs/CONTRIBUTING.md[Contributing Guide]*: How to contribute
+- *link:CLAUDE.md[CLAUDE.md]*: AI assistant guidance for development
 
 == 🧪 Testing
 
-```bash
-= Run all tests
+[source,bash]
+----
+# Run all tests
 
 rebar3 lfe test
 
-= Run with coverage
+# Run with coverage
 
 rebar3 lfe test --cover
 
-= Run specific test module
+# Run specific test module
 
 rebar3 lfe test --module=sbf_patterns_tests
-```
+----
 
 == 🗺️ Roadmap
 
 === v0.2.0 (Planned)
-- [ ] SSH brute-force module
-- [ ] FTP support
-- [ ] Database connection testing
-- [ ] Distributed worker support
-- [ ] Web UI dashboard
-- [ ] Enhanced reporting (PDF, HTML)
+* [ ] SSH brute-force module
+* [ ] FTP support
+* [ ] Database connection testing
+* [ ] Distributed worker support
+* [ ] Web UI dashboard
+* [ ] Enhanced reporting (PDF, HTML)
 
 === v0.3.0 (Future)
-- [ ] Machine learning pattern generation
-- [ ] Cloud integration (AWS, GCP, Azure)
-- [ ] SIEM integration
-- [ ] Custom plugin system
-- [ ] Performance optimizations
+* [ ] Machine learning pattern generation
+* [ ] Cloud integration (AWS, GCP, Azure)
+* [ ] SIEM integration
+* [ ] Custom plugin system
+* [ ] Performance optimizations
 
 == 🤝 Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see link:docs/CONTRIBUTING.md[CONTRIBUTING.md] for guidelines.
 
 === Contributors
 
-- [Hyperpolymath](https://github.com/Hyperpolymath) - Creator and maintainer
+- link:https://github.com/Hyperpolymath[Hyperpolymath] - Creator and maintainer
 
 == 📜 License
 
-Palimpsest-MPL-1.0 License - See [LICENSE](LICENSE) for details.
+Palimpsest-MPL-1.0 License - See link:LICENSE[LICENSE] for details.
 
 *Note*: While the software is open source, users are responsible for ensuring their use complies with all applicable laws and regulations.
 
@@ -415,9 +422,9 @@ This project maintains the principle of *"Safety First"*:
 == 📞 Support
 
 - *Documentation*: Check the `docs/` directory
-- *Issues*: [GitHub Issues](https://github.com/Hyperpolymath/safe-brute-force/issues)
-- *Discussions*: [GitHub Discussions](https://github.com/Hyperpolymath/safe-brute-force/discussions)
-- *Security*: See [SECURITY.md](docs/SECURITY.md) for responsible disclosure
+- *Issues*: link:https://github.com/Hyperpolymath/safe-brute-force/issues[GitHub Issues]
+- *Discussions*: link:https://github.com/Hyperpolymath/safe-brute-force/discussions[GitHub Discussions]
+- *Security*: See link:docs/SECURITY.md[SECURITY.md] for responsible disclosure
 
 == 🙏 Acknowledgments
 
