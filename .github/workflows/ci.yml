@@ -20,7 +20,6 @@ env:
   REBAR3_VERSION: '3.22.1'
 
 permissions: read-all
-  actions: read
 
 jobs:
   ###########################################################################
