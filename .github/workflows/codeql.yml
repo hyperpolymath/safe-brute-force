@@ -23,7 +23,6 @@ on:
     - cron: '37 15 * * 1'
 
 permissions: read-all
-  actions: read
 
 jobs:
   analyze:
