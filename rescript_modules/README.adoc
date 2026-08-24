@@ -1,42 +1,44 @@
-<!--
-SPDX-License-Identifier: CC-BY-SA-4.0
-Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
--->
-# ReScript Pattern Generation Module
+== ReScript Pattern Generation Module
 
-This module provides **100% type-safe pattern generation** for SafeBruteForce.
+This module provides *100% type-safe pattern generation* for
+SafeBruteForce.
 
-## Why ReScript?
+=== Why ReScript?
 
-- ✅ **100% compile-time type safety** (no runtime type errors)
-- ✅ **Sound type system** (no null, no undefined, exhaustive pattern matching)
-- ✅ **Compiles to JavaScript** (easy Erlang/Node.js interop via ports)
-- ✅ **Excellent performance** (optimized JS output)
-- ✅ **No runtime overhead** (types erased at compile time)
+* ✅ *100% compile-time type safety* (no runtime type errors)
+* ✅ *Sound type system* (no null, no undefined, exhaustive pattern
+matching)
+* ✅ *Compiles to JavaScript* (easy Erlang/Node.js interop via ports)
+* ✅ *Excellent performance* (optimized JS output)
+* ✅ *No runtime overhead* (types erased at compile time)
 
-## Type Safety Guarantees
+=== Type Safety Guarantees
 
-```rescript
+[source,rescript]
+----
 // This will NOT compile - type error caught at build time:
 let bad = generateCharsetCombinations(123, "a", "b")  // ❌ Type error!
 
 // This WILL compile - types are correct:
 let good = generateCharsetCombinations("abc", 1, 3)   // ✅ Type safe!
-```
+----
 
-## Building
+=== Building
 
-```bash
+[source,bash]
+----
 cd rescript_modules
 npm install
 npm run build
-```
+----
 
-## Usage from Erlang
+=== Usage from Erlang
 
-The ReScript module compiles to JavaScript and can be called from Erlang via ports:
+The ReScript module compiles to JavaScript and can be called from Erlang
+via ports:
 
-```erlang
+[source,erlang]
+----
 %% In Erlang
 Port = open_port({spawn, "node pattern_generator.js"}, [binary]),
 port_command(Port, term_to_binary({generate, charset, #{
@@ -49,11 +51,12 @@ receive
         Patterns = binary_to_term(Binary),
         io:format("Generated: ~p~n", [Patterns])
 end.
-```
+----
 
-## From LFE
+=== From LFE
 
-```lisp
+[source,lisp]
+----
 (defun generate-patterns-rescript (type config)
   "Call ReScript pattern generator via Node.js port"
   (let* ((port (erlang:open_port
@@ -64,31 +67,33 @@ end.
     (receive
       ((tuple port (tuple 'data result))
        (jsx:decode result)))))
-```
+----
 
-## Type-Safe API
+=== Type-Safe API
 
 All functions have explicit type signatures:
 
-```rescript
+[source,rescript]
+----
 let generateCharsetCombinations: (
   charset,      // string
   int,          // min length
   int,          // max length
 ) => result<array<pattern>, generatorError>  // Result type
-```
+----
 
-## Benefits for SafeBruteForce
+=== Benefits for SafeBruteForce
 
-1. **Pattern Generation**: 100% type-safe implementation
-2. **FFI Contracts**: Type-safe boundary with Erlang
-3. **Mutation Engine**: Compile-time verified transformations
-4. **Validation**: Type-checked pattern validation
-5. **iSOS Model**: Demonstrates multi-language verification
+[arabic]
+. *Pattern Generation*: 100% type-safe implementation
+. *FFI Contracts*: Type-safe boundary with Erlang
+. *Mutation Engine*: Compile-time verified transformations
+. *Validation*: Type-checked pattern validation
+. *iSOS Model*: Demonstrates multi-language verification
 
-## Architecture
+=== Architecture
 
-```
+....
 ┌─────────────────────────────────────┐
 │   Erlang/LFE (Dynamic)              │
 │   - OTP Supervision                 │
@@ -103,26 +108,26 @@ let generateCharsetCombinations: (
 │   - Mutation Engine                 │
 │   - Validation Logic                │
 └─────────────────────────────────────┘
-```
+....
 
-## Testing
+=== Testing
 
-```bash
+[source,bash]
+----
 # Type check (compile)
 npm run build
 
 # If it compiles, types are correct!
 # ReScript: "If it compiles, it works"
-```
+----
 
-## RSR Compliance
+=== RSR Compliance
 
-This module achieves:
-- ✅ **100% Type Safety** (compile-time guarantees)
-- ✅ **100% Memory Safety** (JS GC + no unsafe operations)
-- ✅ **Offline-First** (no network dependencies)
-- ✅ **Reproducible Builds** (deterministic compilation)
+This module achieves: - ✅ *100% Type Safety* (compile-time guarantees)
+- ✅ *100% Memory Safety* (JS GC + no unsafe operations) - ✅
+*Offline-First* (no network dependencies) - ✅ *Reproducible Builds*
+(deterministic compilation)
 
-## License
+=== License
 
 MIT (same as SafeBruteForce parent project)
