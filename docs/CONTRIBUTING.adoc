@@ -1,87 +1,84 @@
-<!--
-SPDX-License-Identifier: CC-BY-SA-4.0
-Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
--->
-# Contributing to SafeBruteForce
+== Contributing to SafeBruteForce
 
-Thank you for your interest in contributing to SafeBruteForce! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to SafeBruteForce! This
+document provides guidelines for contributing to the project.
 
-## Table of Contents
+=== Table of Contents
 
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Development Setup](#development-setup)
-4. [How to Contribute](#how-to-contribute)
-5. [Coding Standards](#coding-standards)
-6. [Testing](#testing)
-7. [Documentation](#documentation)
-8. [Security Considerations](#security-considerations)
+[arabic]
+. link:#code-of-conduct[Code of Conduct]
+. link:#getting-started[Getting Started]
+. link:#development-setup[Development Setup]
+. link:#how-to-contribute[How to Contribute]
+. link:#coding-standards[Coding Standards]
+. link:#testing[Testing]
+. link:#documentation[Documentation]
+. link:#security-considerations[Security Considerations]
 
-## Code of Conduct
+=== Code of Conduct
 
-### Ethical Requirements
+==== Ethical Requirements
 
 All contributors must:
 
-- ✅ Understand this is a **defensive security tool**
-- ✅ Commit to **ethical use only**
-- ✅ Follow **responsible disclosure** practices
-- ✅ Respect **authorization requirements**
-- ✅ Maintain the **"Safety First"** principle
+* ✅ Understand this is a *defensive security tool*
+* ✅ Commit to *ethical use only*
+* ✅ Follow *responsible disclosure* practices
+* ✅ Respect *authorization requirements*
+* ✅ Maintain the *"`Safety First`"* principle
 
-### What We Won't Accept
+==== What We Won’t Accept
 
 We will reject contributions that:
 
-- ❌ Remove or bypass safety mechanisms
-- ❌ Encourage unauthorized access
-- ❌ Implement DoS/DDoS capabilities
-- ❌ Enable mass credential stuffing
-- ❌ Violate ethical hacking principles
+* ❌ Remove or bypass safety mechanisms
+* ❌ Encourage unauthorized access
+* ❌ Implement DoS/DDoS capabilities
+* ❌ Enable mass credential stuffing
+* ❌ Violate ethical hacking principles
 
-## Getting Started
+=== Getting Started
 
-### Prerequisites
+==== Prerequisites
 
-- Erlang/OTP 26+
-- Rebar3
-- LFE (Lisp Flavored Erlang)
-- Git
-- Basic understanding of:
-  - Functional programming
-  - Erlang/OTP design principles
-  - Brute-force techniques
-  - Security testing ethics
+* Erlang/OTP 26+
+* Rebar3
+* LFE (Lisp Flavored Erlang)
+* Git
+* Basic understanding of:
+** Functional programming
+** Erlang/OTP design principles
+** Brute-force techniques
+** Security testing ethics
 
-### First Contribution
+==== First Contribution
 
 Good first issues for newcomers:
 
-1. **Documentation improvements**
-   - Fix typos
-   - Add examples
-   - Improve clarity
+[arabic]
+. *Documentation improvements*
+* Fix typos
+* Add examples
+* Improve clarity
+. *Pattern generators*
+* Add new wordlist mutation strategies
+* Implement date/time patterns
+* Create industry-specific patterns
+. *Output formatting*
+* Improve console output
+* Add export formats (JSON, CSV)
+* Enhanced progress bars
+. *Test coverage*
+* Add unit tests
+* Write integration tests
+* Test edge cases
 
-2. **Pattern generators**
-   - Add new wordlist mutation strategies
-   - Implement date/time patterns
-   - Create industry-specific patterns
+=== Development Setup
 
-3. **Output formatting**
-   - Improve console output
-   - Add export formats (JSON, CSV)
-   - Enhanced progress bars
+==== Clone and Build
 
-4. **Test coverage**
-   - Add unit tests
-   - Write integration tests
-   - Test edge cases
-
-## Development Setup
-
-### Clone and Build
-
-```bash
+[source,bash]
+----
 # Fork the repository first on GitHub
 git clone https://github.com/YOUR_USERNAME/safe-brute-force.git
 cd safe-brute-force
@@ -94,11 +91,12 @@ rebar3 compile
 
 # Run tests
 rebar3 lfe test
-```
+----
 
-### Development Workflow
+==== Development Workflow
 
-```bash
+[source,bash]
+----
 # Create a feature branch
 git checkout -b feature/your-feature-name
 
@@ -115,11 +113,12 @@ git commit -m "Add: description of your changes"
 git push origin feature/your-feature-name
 
 # Open Pull Request on GitHub
-```
+----
 
-### Interactive Development
+==== Interactive Development
 
-```bash
+[source,bash]
+----
 # Start REPL for interactive testing
 rebar3 lfe repl
 
@@ -128,15 +127,16 @@ rebar3 lfe repl
 
 # Test functions
 > (your_module:your_function args)
-```
+----
 
-## How to Contribute
+=== How to Contribute
 
-### Reporting Bugs
+==== Reporting Bugs
 
 Use GitHub Issues with the following template:
 
-```markdown
+[source,markdown]
+----
 **Bug Description**
 Clear description of the bug
 
@@ -157,11 +157,12 @@ What you expected to happen
 
 **Additional Context**
 Logs, screenshots, etc.
-```
+----
 
-### Suggesting Enhancements
+==== Suggesting Enhancements
 
-```markdown
+[source,markdown]
+----
 **Feature Description**
 Clear description of the feature
 
@@ -176,24 +177,25 @@ How does this maintain safety/ethical use?
 
 **Alternatives Considered**
 Other approaches you've thought about
-```
+----
 
-### Pull Requests
+==== Pull Requests
 
-#### PR Checklist
+===== PR Checklist
 
-- [ ] Code follows LFE style guide
-- [ ] All tests pass (`rebar3 lfe test`)
-- [ ] New code has tests
-- [ ] Documentation updated
-- [ ] CHANGELOG.md updated
-- [ ] Commit messages are clear
-- [ ] Safety mechanisms preserved
-- [ ] No sensitive data in commits
+* [ ] Code follows LFE style guide
+* [ ] All tests pass (`+rebar3 lfe test+`)
+* [ ] New code has tests
+* [ ] Documentation updated
+* [ ] CHANGELOG.md updated
+* [ ] Commit messages are clear
+* [ ] Safety mechanisms preserved
+* [ ] No sensitive data in commits
 
-#### PR Template
+===== PR Template
 
-```markdown
+[source,markdown]
+----
 ## Description
 What does this PR do?
 
@@ -214,15 +216,16 @@ How was this tested?
 
 ## Related Issues
 Closes #123
-```
+----
 
-## Coding Standards
+=== Coding Standards
 
-### LFE Style Guide
+==== LFE Style Guide
 
-#### Module Structure
+===== Module Structure
 
-```lisp
+[source,lisp]
+----
 ;;;; Module Title
 ;;;; Brief description
 
@@ -251,11 +254,12 @@ Closes #123
   "Internal helper function"
   ;; Implementation
   )
-```
+----
 
-#### Naming Conventions
+===== Naming Conventions
 
-```lisp
+[source,lisp]
+----
 ;; Functions: lowercase with hyphens
 (defun calculate-checksum (data) ...)
 
@@ -273,11 +277,12 @@ Closes #123
   (('success data) ...)
   (('failure reason) ...)
   (('error error) ...))
-```
+----
 
-#### Comments and Documentation
+===== Comments and Documentation
 
-```lisp
+[source,lisp]
+----
 ;; Single line comments for code explanation
 
 ;;; Section dividers for major sections
@@ -295,11 +300,12 @@ Closes #123
      Description of return value"
   ;; Implementation
   )
-```
+----
 
-### Error Handling
+==== Error Handling
 
-```lisp
+[source,lisp]
+----
 ;; Always return tagged tuples
 (defun safe-operation (input)
   (try
@@ -317,11 +323,12 @@ Closes #123
    (handle-success result))
   ((tuple 'error reason)
    (handle-error reason)))
-```
+----
 
-### Testing Standards
+==== Testing Standards
 
-```lisp
+[source,lisp]
+----
 ;;;; Module Tests
 
 (defmodule module_tests
@@ -343,13 +350,14 @@ Closes #123
   (case (module:risky-function bad-input)
     ((tuple 'error _) 'ok)
     (_ (eunit:assert_failed "Should have returned error"))))
-```
+----
 
-## Testing
+=== Testing
 
-### Running Tests
+==== Running Tests
 
-```bash
+[source,bash]
+----
 # All tests
 rebar3 lfe test
 
@@ -358,26 +366,26 @@ rebar3 lfe test --module=sbf_patterns_tests
 
 # With coverage
 rebar3 lfe test --cover
-```
+----
 
-### Test Requirements
+==== Test Requirements
 
 Every new feature must include:
 
-1. **Unit tests** - Test individual functions
-2. **Integration tests** - Test component interactions
-3. **Edge case tests** - Test boundary conditions
-4. **Error tests** - Test error handling
+[arabic]
+. *Unit tests* - Test individual functions
+. *Integration tests* - Test component interactions
+. *Edge case tests* - Test boundary conditions
+. *Error tests* - Test error handling
 
-### Test Safety
+==== Test Safety
 
-Tests must:
-- Use mock/local targets only
-- Not make external network calls (unless mocked)
-- Not test against real systems
-- Include safety pause verification
+Tests must: - Use mock/local targets only - Not make external network
+calls (unless mocked) - Not test against real systems - Include safety
+pause verification
 
-```lisp
+[source,lisp]
+----
 (defun safety_pause_test ()
   "Verify safety pause triggers correctly"
   (let ((config (list (tuple 'pause_interval 5)
@@ -385,24 +393,26 @@ Tests must:
     ;; Test pause triggers at correct interval
     ;; ...
     ))
-```
+----
 
-## Documentation
+=== Documentation
 
-### Required Documentation
+==== Required Documentation
 
 When adding features, update:
 
-1. **Code comments** - Inline documentation
-2. **Docstrings** - Function documentation
-3. **README.md** - If feature is user-facing
-4. **docs/USAGE.md** - Usage examples
-5. **CHANGELOG.md** - Version history
-6. **CLAUDE.md** - AI assistant guidance (if architecture changes)
+[arabic]
+. *Code comments* - Inline documentation
+. *Docstrings* - Function documentation
+. *README.md* - If feature is user-facing
+. *docs/USAGE.md* - Usage examples
+. *CHANGELOG.md* - Version history
+. *CLAUDE.md* - AI assistant guidance (if architecture changes)
 
-### Documentation Style
+==== Documentation Style
 
-```markdown
+[source,markdown]
+----
 # Feature Name
 
 ## Overview
@@ -411,87 +421,87 @@ Brief description of feature
 ## Usage
 ```lisp
 (example:code "here")
-```
+----
 
-## Parameters
-- `param1` - Description
-- `param2` - Description
+=== Parameters
 
-## Returns
+* `+param1+` - Description
+* `+param2+` - Description
+
+=== Returns
+
 Description of return value
 
-## Examples
-```lisp
+=== Examples
+
+[source,lisp]
+----
 ;; Example 1: Basic usage
 (example:basic)
 
 ;; Example 2: Advanced usage
 (example:advanced options)
-```
+----
 
-## Notes
-Any important notes or warnings
-```
+=== Notes
 
-## Security Considerations
+Any important notes or warnings ```
 
-### Security Review Checklist
+=== Security Considerations
+
+==== Security Review Checklist
 
 All PRs must pass security review:
 
-- [ ] No hardcoded credentials
-- [ ] Input validation implemented
-- [ ] Rate limiting respected
-- [ ] Safety pause mechanism intact
-- [ ] No sensitive data in logs
-- [ ] Authorization checks present
-- [ ] Error messages don't leak info
-- [ ] Dependencies are trusted
+* [ ] No hardcoded credentials
+* [ ] Input validation implemented
+* [ ] Rate limiting respected
+* [ ] Safety pause mechanism intact
+* [ ] No sensitive data in logs
+* [ ] Authorization checks present
+* [ ] Error messages don’t leak info
+* [ ] Dependencies are trusted
 
-### Responsible Disclosure
+==== Responsible Disclosure
 
 If you discover a security vulnerability:
 
-1. **DO NOT** create a public issue
-2. Email security@[domain] with details
-3. Allow reasonable time for fix
-4. Follow coordinated disclosure
+[arabic]
+. *DO NOT* create a public issue
+. Email security@[domain] with details
+. Allow reasonable time for fix
+. Follow coordinated disclosure
 
-### Safety Mechanism Policy
+==== Safety Mechanism Policy
 
-**Never submit PRs that:**
-- Disable safety pause by default
-- Remove authorization checks
-- Bypass rate limiting
-- Enable mass/distributed attacks
-- Implement evasion techniques
+*Never submit PRs that:* - Disable safety pause by default - Remove
+authorization checks - Bypass rate limiting - Enable mass/distributed
+attacks - Implement evasion techniques
 
-## Getting Help
+=== Getting Help
 
-### Resources
+==== Resources
 
-- **Documentation**: Read `docs/` directory
-- **Examples**: Check `examples/` directory
-- **Tests**: Look at existing tests for patterns
-- **CLAUDE.md**: Guidance for understanding architecture
+* *Documentation*: Read `+docs/+` directory
+* *Examples*: Check `+examples/+` directory
+* *Tests*: Look at existing tests for patterns
+* *CLAUDE.md*: Guidance for understanding architecture
 
-### Communication
+==== Communication
 
-- **GitHub Issues**: Bug reports and feature requests
-- **Pull Requests**: Code discussions
-- **Discussions**: General questions and ideas
+* *GitHub Issues*: Bug reports and feature requests
+* *Pull Requests*: Code discussions
+* *Discussions*: General questions and ideas
 
-### Maintainer Contact
+==== Maintainer Contact
 
-- Create an issue for project-related questions
-- Email for security concerns
-- Tag `@maintainer` in discussions
+* Create an issue for project-related questions
+* Email for security concerns
+* Tag `+@maintainer+` in discussions
 
-## Recognition
+=== Recognition
 
-Contributors will be:
-- Listed in CONTRIBUTORS.md
-- Credited in release notes
-- Acknowledged in README.md
+Contributors will be: - Listed in CONTRIBUTORS.md - Credited in release
+notes - Acknowledged in README.md
 
 Thank you for helping make SafeBruteForce better! 🛡️

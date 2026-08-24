@@ -1,32 +1,33 @@
-<!--
-SPDX-License-Identifier: CC-BY-SA-4.0
-Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
--->
-# Rust NIF Module for SafeBruteForce
+== Rust NIF Module for SafeBruteForce
 
-This module provides **100% type-safe AND memory-safe** high-performance pattern generation using Rust NIFs (Native Implemented Functions).
+This module provides *100% type-safe AND memory-safe* high-performance
+pattern generation using Rust NIFs (Native Implemented Functions).
 
-## Why Rust?
+=== Why Rust?
 
-- ✅ **100% compile-time type safety** (strong static typing)
-- ✅ **100% memory safety** (ownership system, no GC needed)
-- ✅ **Zero-cost abstractions** (compiled, not interpreted)
-- ✅ **Parallel processing** (Rayon for multi-core)
-- ✅ **No unsafe blocks** (this entire module is safe Rust)
+* ✅ *100% compile-time type safety* (strong static typing)
+* ✅ *100% memory safety* (ownership system, no GC needed)
+* ✅ *Zero-cost abstractions* (compiled, not interpreted)
+* ✅ *Parallel processing* (Rayon for multi-core)
+* ✅ *No unsafe blocks* (this entire module is safe Rust)
 
-## Safety Guarantees
+=== Safety Guarantees
 
-### Type Safety
-```rust
+==== Type Safety
+
+[source,rust]
+----
 // This will NOT compile - type error:
 let bad = generate_charset_combinations(123, "a", "b");  // ❌
 
 // This WILL compile - types correct:
 let good = generate_charset_combinations(&charset, 1, 3); // ✅
-```
+----
 
-### Memory Safety
-```rust
+==== Memory Safety
+
+[source,rust]
+----
 // NO manual memory management
 // NO use-after-free
 // NO buffer overflows
@@ -34,21 +35,23 @@ let good = generate_charset_combinations(&charset, 1, 3); // ✅
 // NO null pointer dereferences
 
 // All guaranteed by Rust compiler!
-```
+----
 
-## Building
+=== Building
 
-```bash
+[source,bash]
+----
 cd rust_nif
 cargo build --release
 
 # For Erlang integration
 # The .so file will be in target/release/
-```
+----
 
-## Usage from Erlang
+=== Usage from Erlang
 
-```erlang
+[source,erlang]
+----
 %% Load the NIF
 -module(sbf_rust).
 -export([generate_patterns/3]).
@@ -61,11 +64,12 @@ init() ->
 %% Call Rust function
 generate_patterns(Charset, MinLen, MaxLen) ->
     sbf_nif:generate_charset_combinations(Charset, MinLen, MaxLen).
-```
+----
 
-## From LFE
+=== From LFE
 
-```lisp
+[source,lisp]
+----
 (defun generate-patterns-rust (charset min-len max-len)
   "Call Rust NIF for high-performance pattern generation"
   (sbf_nif:generate_charset_combinations_nif charset min-len max-len))
@@ -74,64 +78,71 @@ generate_patterns(Charset, MinLen, MaxLen) ->
 (defun generate-sequential-fast (start end)
   "Parallel sequential generation using Rust"
   (sbf_nif:generate_sequential_parallel_nif start end))
-```
+----
 
-## Performance
+=== Performance
 
-Rust NIFs are **dramatically faster** than pure Erlang for CPU-intensive work:
+Rust NIFs are *dramatically faster* than pure Erlang for CPU-intensive
+work:
 
-| Operation | Erlang | Rust NIF | Speedup |
-|-----------|--------|----------|---------|
-| Generate 10k patterns | 500ms | 50ms | 10x |
-| Wordlist mutations | 200ms | 20ms | 10x |
-| Parallel processing | N/A | 4-core | 3-4x |
+[cols=",,,",options="header",]
+|===
+|Operation |Erlang |Rust NIF |Speedup
+|Generate 10k patterns |500ms |50ms |10x
+|Wordlist mutations |200ms |20ms |10x
+|Parallel processing |N/A |4-core |3-4x
+|===
 
-## Type-Safe API
+=== Type-Safe API
 
 All functions have explicit type signatures:
 
-```rust
+[source,rust]
+----
 pub fn generate_charset_combinations(
     charset: &Charset,        // Validated type
     min_length: usize,        // Cannot be negative
     max_length: usize,        // Cannot be negative
 ) -> Result<Vec<Pattern>, GeneratorError>  // Explicit errors
-```
+----
 
-## Memory Safety Features
+=== Memory Safety Features
 
-1. **Ownership System**: No manual malloc/free
-2. **Borrow Checker**: No use-after-free
-3. **Bounds Checking**: No buffer overflows
-4. **No Null**: Option<T> instead
-5. **Thread Safety**: Send/Sync traits
-6. **RAII**: Automatic cleanup
+[arabic]
+. *Ownership System*: No manual malloc/free
+. *Borrow Checker*: No use-after-free
+. *Bounds Checking*: No buffer overflows
+. *No Null*: Option instead
+. *Thread Safety*: Send/Sync traits
+. *RAII*: Automatic cleanup
 
-## Parallel Processing
+=== Parallel Processing
 
 Uses Rayon for multi-core processing:
 
-```rust
+[source,rust]
+----
 // Automatically uses all CPU cores
 let patterns: Vec<String> = (start..=end)
     .into_par_iter()  // Parallel!
     .map(|n| n.to_string())
     .collect();
-```
+----
 
-## Zero Unsafe Code
+=== Zero Unsafe Code
 
-This entire module contains **ZERO unsafe blocks**:
+This entire module contains *ZERO unsafe blocks*:
 
-```rust
+[source,rust]
+----
 // ✅ All safe Rust
 // ✅ Compiler-verified
 // ✅ No undefined behavior possible
-```
+----
 
-## Architecture
+=== Architecture
 
-```
+....
 ┌─────────────────────────────────────┐
 │   Erlang/LFE (Dynamic)              │
 │   - OTP Supervision                 │
@@ -145,20 +156,19 @@ This entire module contains **ZERO unsafe blocks**:
 │   - Parallel processing             │
 │   - Zero-copy where possible        │
 └─────────────────────────────────────┘
-```
+....
 
-## RSR Compliance
+=== RSR Compliance
 
-This module achieves:
-- ✅ **100% Type Safety** (Rust compile-time)
-- ✅ **100% Memory Safety** (ownership + borrow checker)
-- ✅ **100% Reproducible Builds** (Cargo.lock + deterministic)
-- ✅ **Offline-First** (no network dependencies)
-- ✅ **Zero Unsafe** (no unsafe blocks)
+This module achieves: - ✅ *100% Type Safety* (Rust compile-time) - ✅
+*100% Memory Safety* (ownership + borrow checker) - ✅ *100%
+Reproducible Builds* (Cargo.lock + deterministic) - ✅ *Offline-First*
+(no network dependencies) - ✅ *Zero Unsafe* (no unsafe blocks)
 
-## Testing
+=== Testing
 
-```bash
+[source,bash]
+----
 # Run tests
 cargo test
 
@@ -167,27 +177,33 @@ cargo tarpaulin
 
 # Benchmarks
 cargo bench
-```
+----
 
-## Common Patterns
+=== Common Patterns
 
-### Pattern Generation
-```rust
+==== Pattern Generation
+
+[source,rust]
+----
 let charset = Charset::new("abc").unwrap();
 let patterns = generate_charset_combinations(&charset, 2, 3)?;
-```
+----
 
-### Mutations
-```rust
+==== Mutations
+
+[source,rust]
+----
 let mutated = apply_mutations("password", MutationLevel::Standard);
-```
+----
 
-### Statistics
-```rust
+==== Statistics
+
+[source,rust]
+----
 let stats = calculate_stats(&patterns);
 println!("Total: {}, Unique: {}", stats.total_patterns, stats.unique_patterns);
-```
+----
 
-## License
+=== License
 
 MIT (same as SafeBruteForce parent project)
