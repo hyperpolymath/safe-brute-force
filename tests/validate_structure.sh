@@ -13,15 +13,39 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 # Required root files
-[ -f README.adoc ]    && pass "README.adoc present"    || fail "README.adoc missing"
-[ -f LICENSE ]        && pass "LICENSE present"         || fail "LICENSE missing"
-[ -f SECURITY.md ]    && pass "SECURITY.md present"    || fail "SECURITY.md missing"
-[ -f Justfile ]       && pass "Justfile present"        || fail "Justfile missing"
-[ -f rebar.config ]   && pass "rebar.config present"   || fail "rebar.config missing"
+if [ -f README.adoc ]; then
+  pass "README.adoc present"
+else
+  fail "README.adoc missing"
+fi
+if [ -f LICENSE ]; then
+  pass "LICENSE present"
+else
+  fail "LICENSE missing"
+fi
+if [ -f SECURITY.adoc ]; then pass "SECURITY.adoc present"; else fail "SECURITY.adoc missing"; fi
+if [ -f Justfile ]; then
+  pass "Justfile present"
+else
+  fail "Justfile missing"
+fi
+if [ -f rebar.config ]; then
+  pass "rebar.config present"
+else
+  fail "rebar.config missing"
+fi
 
 # Required directories
-[ -d src ]            && pass "src/ directory present"  || fail "src/ directory missing"
-[ -d test ]           && pass "test/ directory present" || fail "test/ directory missing"
+if [ -d src ]; then
+  pass "src/ directory present"
+else
+  fail "src/ directory missing"
+fi
+if [ -d test ]; then
+  pass "test/ directory present"
+else
+  fail "test/ directory missing"
+fi
 
 # GitHub workflows — require at least 3
 WORKFLOW_COUNT=0
