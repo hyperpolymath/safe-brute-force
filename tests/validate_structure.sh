@@ -15,7 +15,7 @@ cd "$REPO_ROOT"
 # Required root files
 [ -f README.adoc ]    && pass "README.adoc present"    || fail "README.adoc missing"
 [ -f LICENSE ]        && pass "LICENSE present"         || fail "LICENSE missing"
-[ -f SECURITY.md ]    && pass "SECURITY.md present"    || fail "SECURITY.md missing"
+[ -f SECURITY.adoc ]    && pass "SECURITY.adoc present"    || fail "SECURITY.adoc missing"
 [ -f Justfile ]       && pass "Justfile present"        || fail "Justfile missing"
 [ -f rebar.config ]   && pass "rebar.config present"   || fail "rebar.config missing"
 
